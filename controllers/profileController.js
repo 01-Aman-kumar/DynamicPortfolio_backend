@@ -204,7 +204,7 @@ exports.getPublicPortfolios = async (req, res) => {
           isVisible: true,
         })
           .sort({ featured: -1 })
-          .limit(2);
+          .limit(6);
 
         return {
           profile,

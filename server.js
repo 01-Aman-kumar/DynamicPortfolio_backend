@@ -18,6 +18,7 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: "https://dynamic-portfolio-eight-nu.vercel.app",
+  // origin: "http://localhost:3000",
   credentials: true,
 }));
 app.use(express.json());
