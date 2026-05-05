@@ -1,25 +1,26 @@
 const express = require("express");
 const router = express.Router();
+
 const protect = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
 const {
   createAchievement,
-  getAchievements,
-  getPublicAchievements,
   updateAchievement,
   deleteAchievement,
-} = require("../controllers/achievementController");
+  getPublicAchievements,
+  getAchievements,
+  getSingleAchievement,
+} = require("../controllers/achievementController.js");
 
-// (Auth middleware will be added next step)
-
-
-// Protected routes
-router.post("/", protect, createAchievement);
-router.get("/", protect, getAchievements);
-router.put("/:id", protect, updateAchievement);
-router.delete("/:id", protect, deleteAchievement);
-
-// Public route
+// PUBLIC
 router.get("/public/:userId", getPublicAchievements);
+
+// PRIVATE
+router.post("/", protect, upload.single("image"), createAchievement);
+router.get("/", protect, getAchievements);
+router.get("/:id", protect, getSingleAchievement);
+router.put("/:id", protect, upload.single("image"), updateAchievement);
+router.delete("/:id", protect, deleteAchievement);
 
 module.exports = router;

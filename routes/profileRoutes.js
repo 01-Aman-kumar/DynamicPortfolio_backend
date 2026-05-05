@@ -7,6 +7,7 @@ const {
   upsertProfile,
   getMyProfile,
   getPortfolioByUsername,
+  getPublicPortfolios,
 } = require("../controllers/profileController");
 
 // Protected
@@ -16,5 +17,6 @@ router.get("/me", protect, getMyProfile);
 
 // Public
 router.get("/:username", getPortfolioByUsername);
+router.get("/all/public", getPublicPortfolios);
 
 module.exports = router;

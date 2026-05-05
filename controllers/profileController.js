@@ -75,7 +75,7 @@ exports.upsertProfile = async (req, res) => {
       profile = await Profile.findOneAndUpdate(
         { user: userId },
         updateData,
-        { new: true }
+        { returnDocument: 'after' }
       );
 
       return res.json({
@@ -185,6 +185,43 @@ exports.getPortfolioByUsername = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server error",
+    });
+  }
+};
+
+// controllers/profileController.js
+
+exports.getPublicPortfolios = async (req, res) => {
+  try {
+    const profiles = await Profile.find({ isPublic: true })
+      .populate("user", "username")
+      .limit(6); // limit for homepage
+
+    const usersData = await Promise.all(
+      profiles.map(async (profile) => {
+        const projects = await Project.find({
+          user: profile.user._id,
+          isVisible: true,
+        })
+          .sort({ featured: -1 })
+          .limit(2);
+
+        return {
+          profile,
+          projects,
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      data: usersData,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching portfolios",
     });
   }
 };

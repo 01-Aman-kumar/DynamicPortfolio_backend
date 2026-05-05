@@ -98,7 +98,7 @@ exports.updateProject = async (req, res) => {
         ...req.body,
         image: imageData,
       },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     res.json({
@@ -152,6 +152,75 @@ exports.deleteProject = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error deleting project",
+    });
+  }
+};
+
+exports.getPublicProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({
+      isVisible: true,
+    })
+      .sort({ featured: -1, order: 1, createdAt: -1 })
+      .select("-user"); // hide user field
+
+    res.json({
+      success: true,
+      data: projects,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching public projects",
+    });
+  }
+};
+
+exports.getProjectsAdvanced = async (req, res) => {
+  try {
+    const { search = "", page = 1, limit = 6 } = req.query;
+
+    const query = {
+      user: req.user.id,
+      title: { $regex: search, $options: "i" },
+    };
+
+    const projects = await Project.find(query)
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const total = await Project.countDocuments(query);
+
+    res.json({
+      success: true,
+      data: projects,
+      total,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching projects",
+    });
+  }
+};
+
+
+
+exports.getFeaturedProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({
+      isVisible: true,
+      featured: true,
+    }).limit(6);
+
+    res.json({
+      success: true,
+      data: projects,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching featured projects",
     });
   }
 };
