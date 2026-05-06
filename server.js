@@ -1,6 +1,9 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const morgan = require("morgan");
+const fs=require("fs");
+const path=require("path");
 const connectDB = require("./config/db");
 const achievementRoutes = require("./routes/achievementRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -14,6 +17,24 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// ================= LOG FILE SETUP =================
+
+// create logs folder
+const logDirectory = path.join(__dirname, "logs");
+
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory);
+}
+
+// create access.log file
+const accessLogStream = fs.createWriteStream(
+  path.join(logDirectory, "access.log"),
+  { flags: "a" }
+);
+
+// save logs
+app.use(morgan("combined", { stream: accessLogStream }));
 
 // Middleware
 app.use(cors({
