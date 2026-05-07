@@ -43,7 +43,7 @@ const profileSchema = new mongoose.Schema(
 
     theme: {
       type: String,
-      enum: ["dark", "light"],
+      enum: ["dark", "light", "blue", "green"],
       default: "dark",
     },
 
