@@ -13,10 +13,17 @@ const generateToken = (id) => {
 exports.registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+    // check existing username
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({
+        message: "Username already exists",
+      });
+    }
 
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     // Hash password
